@@ -13,6 +13,10 @@ require (
 	github.com/stretchr/testify v1.9.0
 	github.com/x448/float16 v0.8.4
 	golang.org/x/sync v0.3.0
+	github.com/taylor840326/aicloud-sdk-go v0.0.0-20240726154233-8812fa6f132f
+		github.com/bramvdbogaerde/go-scp v1.5.0
+    	github.com/jedib0t/go-pretty/v6 v6.5.9
+    	golang.org/x/crypto v0.18.0
 )
 
 require (
