@@ -3,27 +3,27 @@ module github.com/ollama/ollama
 go 1.22.0
 
 require (
+	github.com/bramvdbogaerde/go-scp v1.5.0
 	github.com/containerd/console v1.0.3
 	github.com/emirpasic/gods v1.18.1
 	github.com/gin-gonic/gin v1.10.0
 	github.com/golang/protobuf v1.5.4 // indirect
 	github.com/google/uuid v1.1.2
+	github.com/jedib0t/go-pretty/v6 v6.5.9
 	github.com/olekukonko/tablewriter v0.0.5
 	github.com/spf13/cobra v1.7.0
 	github.com/stretchr/testify v1.9.0
-	github.com/x448/float16 v0.8.4
-	golang.org/x/sync v0.3.0
 	github.com/taylor840326/aicloud-sdk-go v0.0.0-20240726154233-8812fa6f132f
-		github.com/bramvdbogaerde/go-scp v1.5.0
-    	github.com/jedib0t/go-pretty/v6 v6.5.9
-    	golang.org/x/crypto v0.18.0
+	github.com/x448/float16 v0.8.4
+	golang.org/x/crypto v0.23.0
+	golang.org/x/sync v0.3.0
 )
 
 require (
 	github.com/agnivade/levenshtein v1.1.1
 	github.com/d4l3k/go-bfloat16 v0.0.0-20211005043715-690c3bdd05f1
 	github.com/google/go-cmp v0.6.0
-	github.com/mattn/go-runewidth v0.0.14
+	github.com/mattn/go-runewidth v0.0.15
 	github.com/nlpodyssey/gopickle v0.3.0
 	github.com/pdevine/tensor v0.0.0-20240510204454-f88f4562727c
 )
@@ -71,7 +71,6 @@ require (
 	github.com/twitchyliquid64/golang-asm v0.15.1 // indirect
 	github.com/ugorji/go/codec v1.2.12 // indirect
 	golang.org/x/arch v0.8.0 // indirect
-	golang.org/x/crypto v0.23.0
 	golang.org/x/exp v0.0.0-20231110203233-9a3e6036ecaa
 	golang.org/x/net v0.25.0 // indirect
 	golang.org/x/sys v0.20.0

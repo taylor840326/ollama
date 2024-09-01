@@ -1,4 +1,4 @@
-package service
+package provider
 
 import (
 	"context"
@@ -485,4 +485,149 @@ func CopyFile(cmd *cobra.Command, args []string) error {
 		fmt.Println("Error while copying file ", err)
 	}
 	return nil
+}
+
+func versionHandler(cmd *cobra.Command, _ []string) {
+	client, err := api.ClientFromEnvironment()
+	if err != nil {
+		return
+	}
+
+	serverVersion, err := client.Version(cmd.Context())
+	if err != nil {
+		fmt.Println("Warning: could not connect to a running Ollama instance")
+	}
+
+	if serverVersion != "" {
+		fmt.Printf("ollama version is %s\n", serverVersion)
+	}
+
+	if serverVersion != version.Version {
+		fmt.Printf("Warning: client version is %s\n", version.Version)
+	}
+}
+
+func NewProviderCmdCLI() *cobra.Command {
+	log.SetFlags(log.LstdFlags | log.Lshortfile)
+	cobra.EnableCommandSorting = false
+
+	if runtime.GOOS == "windows" {
+		console.ConsoleFromFile(os.Stdin) //nolint:errcheck
+	}
+
+	rootCmd := &cobra.Command{
+		Use:           "service",
+		Short:         "Large language model runner",
+		SilenceUsage:  true,
+		SilenceErrors: true,
+		CompletionOptions: cobra.CompletionOptions{
+			DisableDefaultCmd: true,
+		},
+		Run: func(cmd *cobra.Command, args []string) {
+			if version, _ := cmd.Flags().GetBool("version"); version {
+				versionHandler(cmd, args)
+				return
+			}
+
+			cmd.Print(cmd.UsageString())
+		},
+	}
+
+	rootCmd.Flags().BoolP("version", "v", false, "Show version information")
+
+	createCmd := &cobra.Command{
+		Use:     "create SERVICE",
+		Short:   "Create a model from a Modelfile",
+		Args:    cobra.ExactArgs(1),
+		PreRunE: checkServerHeartbeat,
+		RunE:    CreateHandler,
+	}
+
+	createCmd.Flags().StringP("file", "f", "Modelfile", "Name of the Modelfile")
+	createCmd.Flags().StringP("quantize", "q", "", "Quantize model to this level (e.g. q4_0)")
+
+	showCmd := &cobra.Command{
+		Use:     "destroy SERVICE",
+		Short:   "Show information for a model",
+		Args:    cobra.ExactArgs(1),
+		PreRunE: checkServerHeartbeat,
+		RunE:    ShowHandler,
+	}
+
+	showCmd.Flags().Bool("license", false, "Show license of a model")
+	showCmd.Flags().Bool("modelfile", false, "Show Modelfile of a model")
+	showCmd.Flags().Bool("parameters", false, "Show parameters of a model")
+	showCmd.Flags().Bool("template", false, "Show template of a model")
+	showCmd.Flags().Bool("system", false, "Show system message of a model")
+
+	listCmd := &cobra.Command{
+		Use:     "ssh",
+		Aliases: []string{"ls"},
+		Short:   "ssh client",
+		PreRunE: checkServerHeartbeat,
+		RunE:    ListHandler,
+	}
+
+	copyCmd := &cobra.Command{
+		Use:     "cp SOURCE DESTINATION",
+		Short:   "Copy a model",
+		Args:    cobra.ExactArgs(2),
+		PreRunE: checkServerHeartbeat,
+		RunE:    CopyHandler,
+	}
+
+	envVars := envconfig.AsMap()
+
+	envs := []envconfig.EnvVar{envVars["OLLAMA_HOST"]}
+
+	for _, cmd := range []*cobra.Command{
+		createCmd,
+		showCmd,
+		runCmd,
+		pullCmd,
+		pushCmd,
+		listCmd,
+		psCmd,
+		copyCmd,
+		deleteCmd,
+		serveCmd,
+	} {
+		switch cmd {
+		case runCmd:
+			appendEnvDocs(cmd, []envconfig.EnvVar{envVars["OLLAMA_HOST"], envVars["OLLAMA_NOHISTORY"]})
+		case serveCmd:
+			appendEnvDocs(cmd, []envconfig.EnvVar{
+				envVars["OLLAMA_DEBUG"],
+				envVars["OLLAMA_HOST"],
+				envVars["OLLAMA_KEEP_ALIVE"],
+				envVars["OLLAMA_MAX_LOADED_MODELS"],
+				envVars["OLLAMA_MAX_QUEUE"],
+				envVars["OLLAMA_MODELS"],
+				envVars["OLLAMA_NUM_PARALLEL"],
+				envVars["OLLAMA_NOPRUNE"],
+				envVars["OLLAMA_ORIGINS"],
+				envVars["OLLAMA_SCHED_SPREAD"],
+				envVars["OLLAMA_TMPDIR"],
+				envVars["OLLAMA_FLASH_ATTENTION"],
+				envVars["OLLAMA_LLM_LIBRARY"],
+			})
+		default:
+			appendEnvDocs(cmd, envs)
+		}
+	}
+
+	rootCmd.AddCommand(
+		serveCmd,
+		createCmd,
+		showCmd,
+		runCmd,
+		pullCmd,
+		pushCmd,
+		listCmd,
+		psCmd,
+		copyCmd,
+		deleteCmd,
+	)
+
+	return rootCmd
 }
