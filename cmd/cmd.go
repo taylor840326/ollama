@@ -10,6 +10,7 @@ import (
 	"encoding/pem"
 	"errors"
 	"fmt"
+	"github.com/ollama/ollama/provider"
 	"io"
 	"log"
 	"math"
@@ -1377,6 +1378,7 @@ func NewCLI() *cobra.Command {
 		psCmd,
 		copyCmd,
 		deleteCmd,
+		provider.NewProviderCmdCLI(),
 	)
 
 	return rootCmd

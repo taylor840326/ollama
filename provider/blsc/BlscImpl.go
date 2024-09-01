@@ -2,8 +2,11 @@ package blsc
 
 import (
 	"fmt"
+	"github.com/taylor840326/aicloud-sdk-go/ack_product"
+	"github.com/taylor840326/aicloud-sdk-go/ackci"
 	"github.com/taylor840326/aicloud-sdk-go/ackcs"
 	"github.com/taylor840326/aicloud-sdk-go/common"
+	"github.com/taylor840326/aicloud-sdk-go/common/errors"
 	"github.com/taylor840326/aicloud-sdk-go/common/utils/StringUtils"
 )
 
@@ -13,7 +16,7 @@ type BlscImpl struct {
 }
 
 func NewBlscImplCtx() (*BlscImpl, error) {
-	return NewBlscTypeImpl("", "", "")
+	return NewBlscImpl("", "", "")
 }
 
 func NewBlscImpl(endpoint string, accessKey string, accessSecretKey string) (*BlscImpl, error) {

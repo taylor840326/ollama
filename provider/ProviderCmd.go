@@ -24,20 +24,17 @@ import (
 
 func DescribeServiceTypes(cmd *cobra.Command, args []string) error {
 
-	typeService, newErr := blsc.NewBlscTypeImplCtx()
+	typeService, newErr := blsc.NewBlscImplCtx()
 	if newErr != errors.SUCCESS {
-		log.Fatalf(newErr.Message)
-		return nil
+		return newErr
 	}
 
 	describeServiceTypesResponse, descErr := typeService.DescribeServiceTypes()
 	if descErr != errors.SUCCESS {
-		log.Fatalf(descErr.Message)
 		return nil
 	}
 
 	if describeServiceTypesResponse.Code != common.AICloudResponseSuccessCode {
-		log.Fatalf(describeServiceTypesResponse.Message)
 		return nil
 	}
 	serviceTypes := describeServiceTypesResponse.Data
@@ -47,7 +44,7 @@ func DescribeServiceTypes(cmd *cobra.Command, args []string) error {
 	header := table.Row{"可用区", "规格类型", "规格", "GPU卡数", "CPU核数", "内存大小", "是否售罄"}
 	t.AppendHeader(header)
 	for _, service := range serviceTypes {
-		typeService, newErr := blsc.NewBlscTypeImplCtx()
+		typeService, newErr := blsc.NewBlscImplCtx()
 		var soldOut bool = false
 		if newErr == errors.SUCCESS {
 			soldOutResponse, sdErr := typeService.DescribeSoldOut(service.Zone.ZoneCode, service.ServiceModel)
@@ -64,20 +61,17 @@ func DescribeServiceTypes(cmd *cobra.Command, args []string) error {
 
 func DescribeImages(cmd *cobra.Command, args []string) error {
 
-	typeService, newErr := blsc.NewBlscTypeImplCtx()
+	typeService, newErr := blsc.NewBlscImplCtx()
 	if newErr != errors.SUCCESS {
-		log.Fatalf(newErr.Message)
 		return nil
 	}
 
 	describePublicImagesResponse, descErr := typeService.DescribePublicImages()
 	if descErr != errors.SUCCESS {
-		log.Fatalf(descErr.Message)
 		return nil
 	}
 
 	if describePublicImagesResponse.Code != common.AICloudResponseSuccessCode {
-		log.Fatalf(describePublicImagesResponse.Message)
 		return nil
 	}
 	publicImages := describePublicImagesResponse.Data
@@ -91,19 +85,16 @@ func DescribeImages(cmd *cobra.Command, args []string) error {
 		t.AppendRow(row)
 	}
 
-	pImageService, newErr := blsc.NewBlscImageImplCtx()
+	pImageService, newErr := blsc.NewBlscImplCtx()
 	if newErr != errors.SUCCESS {
-		log.Fatalf(newErr.Message)
 		return nil
 	}
 
 	privateImagesResponse, descErr := pImageService.DescribeImages("")
 	if descErr != errors.SUCCESS {
-		log.Fatalf(descErr.Message)
 		return nil
 	}
 	if privateImagesResponse.Code != common.AICloudResponseSuccessCode {
-		log.Fatalf(descErr.Message)
 		return nil
 	}
 	privateImages := privateImagesResponse.Data.Rows
@@ -138,9 +129,8 @@ func CreateServices(cmd *cobra.Command, args []string) error {
 	//	return nil
 	//}
 
-	serviceService, newErr := blsc.NewBlscServiceImplCtx()
+	serviceService, newErr := blsc.NewBlscImplCtx()
 	if newErr != errors.SUCCESS {
-		log.Fatalf(newErr.Message)
 		return nil
 	}
 
@@ -156,7 +146,6 @@ func CreateServices(cmd *cobra.Command, args []string) error {
 	}
 	createServicesResponse, createErr := serviceService.CreateService(request)
 	if createErr != errors.SUCCESS {
-		log.Fatalf(createErr.Message)
 		return nil
 	}
 	log.Println(createServicesResponse.Message + ":" + createServicesResponse.Data[0].ResourceUuid)
@@ -172,15 +161,13 @@ func DestroyServices(cmd *cobra.Command, args []string) error {
 	//	return nil
 	//}
 
-	serviceService, newErr := blsc.NewBlscServiceImplCtx()
+	serviceService, newErr := blsc.NewBlscImplCtx()
 	if newErr != errors.SUCCESS {
-		log.Fatalf(newErr.Message)
 		return nil
 	}
 
 	delErr := serviceService.DeleteService(serviceUuid)
 	if delErr != errors.SUCCESS {
-		log.Fatalf(delErr.Message)
 		return nil
 	}
 	log.Println(serviceUuid + " delete successed")
@@ -202,22 +189,19 @@ func CommitServicesChange(cmd *cobra.Command, args []string) error {
 	//	return nil
 	//}
 
-	serviceService, newErr := blsc.NewBlscServiceImplCtx()
+	serviceService, newErr := blsc.NewBlscImplCtx()
 	if newErr != errors.SUCCESS {
-		log.Fatalf(newErr.Message)
 		return nil
 	}
 
 	describeServicesResponse, descErr := serviceService.DescribeServices(serviceUuid)
 	if descErr != errors.SUCCESS {
-		log.Fatalf(descErr.Message)
 		return nil
 	}
 	oneService := describeServicesResponse.Data.Rows[0]
 
-	imageService, newErr := blsc.NewBlscImageImplCtx()
+	imageService, newErr := blsc.NewBlscImplCtx()
 	if newErr != errors.SUCCESS {
-		log.Fatalf(newErr.Message)
 		return nil
 	}
 
@@ -231,7 +215,6 @@ func CommitServicesChange(cmd *cobra.Command, args []string) error {
 	}
 	createImagesResponse, createErr := imageService.CreateImages(createImageRequest)
 	if createErr != errors.SUCCESS {
-		log.Fatalf(createErr.Message)
 		return nil
 	}
 	imageUuid := createImagesResponse.Data[0].ResourceUuid
@@ -248,31 +231,26 @@ func RemoveImages(cmd *cobra.Command, args []string) error {
 	//	return nil
 	//}
 
-	imageService, newErr := blsc.NewBlscImageImplCtx()
+	imageService, newErr := blsc.NewBlscImplCtx()
 	if newErr != errors.SUCCESS {
-		log.Fatalf(newErr.Message)
 		return nil
 	}
 
 	createErr := imageService.DeleteImages(imageUuid)
 	if createErr != errors.SUCCESS {
-		log.Fatalf(createErr.Message)
 		return nil
 	}
-	log.Println(imageUuid + " create successed")
 	return nil
 }
 
 func DescribeService(cmd *cobra.Command, args []string) error {
 
-	serviceService, newErr := blsc.NewBlscServiceImplCtx()
+	serviceService, newErr := blsc.NewBlscImplCtx()
 	if newErr != errors.SUCCESS {
-		log.Fatalf(newErr.Message)
 		return nil
 	}
 	services, descErr := serviceService.DescribeServices("")
 	if descErr != errors.SUCCESS {
-		log.Fatalf(descErr.Message)
 		return nil
 	}
 
@@ -315,10 +293,9 @@ func DescribeServiceJupyter(cmd *cobra.Command, args []string) error {
 	}
 
 	// 使用context初始化BlscServiceImplCtx
-	serviceService, newErr := blsc.NewBlscServiceImplCtx()
+	serviceService, newErr := blsc.NewBlscImplCtx()
 	// 检查初始化是否成功，不成功则终止程序
 	if newErr != errors.SUCCESS {
-		log.Fatalf(newErr.Message)
 		return nil
 	}
 
@@ -326,7 +303,6 @@ func DescribeServiceJupyter(cmd *cobra.Command, args []string) error {
 	jupyters, descErr := serviceService.DescribeServiceJupyter(serviceUuid)
 	// 检查描述服务是否成功，不成功则终止程序
 	if descErr != errors.SUCCESS {
-		log.Fatalf(descErr.Message)
 		return nil
 	}
 
@@ -349,16 +325,14 @@ func DescribeServiceSSH(cmd *cobra.Command, args []string) error {
 	//}
 
 	// 初始化BlscServiceImplCtx，用于后续的服务查询
-	serviceService, newErr := blsc.NewBlscServiceImplCtx()
+	serviceService, newErr := blsc.NewBlscImplCtx()
 	if newErr != errors.SUCCESS {
-		log.Fatalf(newErr.Message)
 		return nil
 	}
 
 	// 根据serviceUuid查询服务的SSH信息
 	sshResp, sshErr := serviceService.DescribeServiceSSH(serviceUuid)
 	if sshErr != errors.SUCCESS {
-		fmt.Println(sshErr.Message)
 		return nil
 	}
 
@@ -444,15 +418,13 @@ func CopyFile(cmd *cobra.Command, args []string) error {
 	}
 	log.Println(locToRemote)
 
-	serviceService, newErr := blsc.NewBlscServiceImplCtx()
+	serviceService, newErr := blsc.NewBlscImplCtx()
 	if newErr != errors.SUCCESS {
-		log.Fatalf(newErr.Message)
 		return nil
 	}
 
 	sshResp, sshErr := serviceService.DescribeServiceSSH(serviceUuid)
 	if sshErr != errors.SUCCESS {
-		fmt.Println(sshErr.Message)
 		return nil
 	}
 
@@ -487,33 +459,13 @@ func CopyFile(cmd *cobra.Command, args []string) error {
 	return nil
 }
 
-func versionHandler(cmd *cobra.Command, _ []string) {
-	client, err := api.ClientFromEnvironment()
-	if err != nil {
-		return
-	}
-
-	serverVersion, err := client.Version(cmd.Context())
-	if err != nil {
-		fmt.Println("Warning: could not connect to a running Ollama instance")
-	}
-
-	if serverVersion != "" {
-		fmt.Printf("ollama version is %s\n", serverVersion)
-	}
-
-	if serverVersion != version.Version {
-		fmt.Printf("Warning: client version is %s\n", version.Version)
-	}
-}
-
 func NewProviderCmdCLI() *cobra.Command {
 	log.SetFlags(log.LstdFlags | log.Lshortfile)
 	cobra.EnableCommandSorting = false
 
-	if runtime.GOOS == "windows" {
-		console.ConsoleFromFile(os.Stdin) //nolint:errcheck
-	}
+	//if runtime.GOOS == "windows" {
+	//	console.ConsoleFromFile(os.Stdin) //nolint:errcheck
+	//}
 
 	rootCmd := &cobra.Command{
 		Use:           "service",
@@ -525,7 +477,7 @@ func NewProviderCmdCLI() *cobra.Command {
 		},
 		Run: func(cmd *cobra.Command, args []string) {
 			if version, _ := cmd.Flags().GetBool("version"); version {
-				versionHandler(cmd, args)
+				//versionHandler(cmd, args)
 				return
 			}
 
@@ -536,97 +488,86 @@ func NewProviderCmdCLI() *cobra.Command {
 	rootCmd.Flags().BoolP("version", "v", false, "Show version information")
 
 	createCmd := &cobra.Command{
-		Use:     "create SERVICE",
-		Short:   "Create a model from a Modelfile",
-		Args:    cobra.ExactArgs(1),
-		PreRunE: checkServerHeartbeat,
-		RunE:    CreateHandler,
+		Use:   "create SERVICE",
+		Short: "Create a model from a Modelfile",
+		Args:  cobra.ExactArgs(1),
+		//PreRunE: checkServerHeartbeat,
+		//RunE:    CreateHandler,
 	}
 
 	createCmd.Flags().StringP("file", "f", "Modelfile", "Name of the Modelfile")
 	createCmd.Flags().StringP("quantize", "q", "", "Quantize model to this level (e.g. q4_0)")
 
-	showCmd := &cobra.Command{
-		Use:     "destroy SERVICE",
-		Short:   "Show information for a model",
-		Args:    cobra.ExactArgs(1),
-		PreRunE: checkServerHeartbeat,
-		RunE:    ShowHandler,
+	destroyCmd := &cobra.Command{
+		Use:   "destroy SERVICE",
+		Short: "Show information for a model",
+		Args:  cobra.ExactArgs(1),
+		//PreRunE: checkServerHeartbeat,
+		//RunE:    ShowHandler,
 	}
 
-	showCmd.Flags().Bool("license", false, "Show license of a model")
-	showCmd.Flags().Bool("modelfile", false, "Show Modelfile of a model")
-	showCmd.Flags().Bool("parameters", false, "Show parameters of a model")
-	showCmd.Flags().Bool("template", false, "Show template of a model")
-	showCmd.Flags().Bool("system", false, "Show system message of a model")
+	commitCmd := &cobra.Command{
+		Use:     "commit",
+		Aliases: []string{"commit"},
+		Short:   "commit",
+		//PreRunE: checkServerHeartbeat,
+		//RunE:    ListHandler,
+	}
 
-	listCmd := &cobra.Command{
+	sshCmd := &cobra.Command{
 		Use:     "ssh",
-		Aliases: []string{"ls"},
+		Aliases: []string{"ssh"},
 		Short:   "ssh client",
-		PreRunE: checkServerHeartbeat,
-		RunE:    ListHandler,
+		//PreRunE: checkServerHeartbeat,
+		//RunE:    ListHandler,
 	}
 
 	copyCmd := &cobra.Command{
-		Use:     "cp SOURCE DESTINATION",
-		Short:   "Copy a model",
-		Args:    cobra.ExactArgs(2),
-		PreRunE: checkServerHeartbeat,
-		RunE:    CopyHandler,
+		Use:   "cp SOURCE DESTINATION",
+		Short: "Copy a file to service",
+		Args:  cobra.ExactArgs(2),
+		//PreRunE: checkServerHeartbeat,
+		//RunE:    CopyHandler,
 	}
 
-	envVars := envconfig.AsMap()
+	//envVars := envconfig.AsMap()
+	//
+	//envs := []envconfig.EnvVar{envVars["OLLAMA_HOST"]}
 
-	envs := []envconfig.EnvVar{envVars["OLLAMA_HOST"]}
-
-	for _, cmd := range []*cobra.Command{
-		createCmd,
-		showCmd,
-		runCmd,
-		pullCmd,
-		pushCmd,
-		listCmd,
-		psCmd,
-		copyCmd,
-		deleteCmd,
-		serveCmd,
-	} {
-		switch cmd {
-		case runCmd:
-			appendEnvDocs(cmd, []envconfig.EnvVar{envVars["OLLAMA_HOST"], envVars["OLLAMA_NOHISTORY"]})
-		case serveCmd:
-			appendEnvDocs(cmd, []envconfig.EnvVar{
-				envVars["OLLAMA_DEBUG"],
-				envVars["OLLAMA_HOST"],
-				envVars["OLLAMA_KEEP_ALIVE"],
-				envVars["OLLAMA_MAX_LOADED_MODELS"],
-				envVars["OLLAMA_MAX_QUEUE"],
-				envVars["OLLAMA_MODELS"],
-				envVars["OLLAMA_NUM_PARALLEL"],
-				envVars["OLLAMA_NOPRUNE"],
-				envVars["OLLAMA_ORIGINS"],
-				envVars["OLLAMA_SCHED_SPREAD"],
-				envVars["OLLAMA_TMPDIR"],
-				envVars["OLLAMA_FLASH_ATTENTION"],
-				envVars["OLLAMA_LLM_LIBRARY"],
-			})
-		default:
-			appendEnvDocs(cmd, envs)
-		}
-	}
+	//for _, cmd := range []*cobra.Command{
+	//	createCmd,
+	//	destroyCmd,
+	//} {
+	//	switch cmd {
+	//	case runCmd:
+	//		appendEnvDocs(cmd, []envconfig.EnvVar{envVars["OLLAMA_HOST"], envVars["OLLAMA_NOHISTORY"]})
+	//	case serveCmd:
+	//		appendEnvDocs(cmd, []envconfig.EnvVar{
+	//			envVars["OLLAMA_DEBUG"],
+	//			envVars["OLLAMA_HOST"],
+	//			envVars["OLLAMA_KEEP_ALIVE"],
+	//			envVars["OLLAMA_MAX_LOADED_MODELS"],
+	//			envVars["OLLAMA_MAX_QUEUE"],
+	//			envVars["OLLAMA_MODELS"],
+	//			envVars["OLLAMA_NUM_PARALLEL"],
+	//			envVars["OLLAMA_NOPRUNE"],
+	//			envVars["OLLAMA_ORIGINS"],
+	//			envVars["OLLAMA_SCHED_SPREAD"],
+	//			envVars["OLLAMA_TMPDIR"],
+	//			envVars["OLLAMA_FLASH_ATTENTION"],
+	//			envVars["OLLAMA_LLM_LIBRARY"],
+	//		})
+	//	default:
+	//		appendEnvDocs(cmd, envs)
+	//	}
+	//}
 
 	rootCmd.AddCommand(
-		serveCmd,
 		createCmd,
-		showCmd,
-		runCmd,
-		pullCmd,
-		pushCmd,
-		listCmd,
-		psCmd,
+		destroyCmd,
+		commitCmd,
+		sshCmd,
 		copyCmd,
-		deleteCmd,
 	)
 
 	return rootCmd

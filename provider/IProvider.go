@@ -1,6 +1,8 @@
 package provider
 
 import (
+	"github.com/taylor840326/aicloud-sdk-go/ack_product"
+	"github.com/taylor840326/aicloud-sdk-go/ackci"
 	"github.com/taylor840326/aicloud-sdk-go/ackcs"
 )
 
